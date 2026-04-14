@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh '''
                 scp -o StrictHostKeyChecking=no index.html $USER@$DEV_SERVER:/tmp/index.html
-                ssh -o StrictHostKeyChecking=no $USER@$stage_SERVER "
+                ssh -o StrictHostKeyChecking=no $USER@$STG_SERVER "
                     sudo yum install httpd -y
                     sudo systemctl start httpd
                     sudo systemctl enable httpd
