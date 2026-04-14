@@ -32,9 +32,9 @@ pipeline {
     }
 }
 
-def deployApp(SERVER_IP) {
+def deployApp() {
     sh """
-    ssh -o StrictHostKeyChecking=no ec2-user@${SERVER_IP} '
+    ssh -o StrictHostKeyChecking=no ec2-user@54.163.56.145 '
     
     # Clean old app
     docker stop myapp || true
@@ -51,10 +51,10 @@ def deployApp(SERVER_IP) {
     '
     
     # Copy project files to server
-    scp -o StrictHostKeyChecking=no -r * ec2-user@${SERVER_IP}:/home/ec2-user/app/
+    scp -o StrictHostKeyChecking=no -r * ec2-user@54.163.56.145:/home/ec2-user/app/
 
     # Build and run on server
-    ssh -o StrictHostKeyChecking=no ec2-user@${SERVER_IP} '
+    ssh -o StrictHostKeyChecking=no ec2-user@54.163.56.145 '
     
     cd /home/ec2-user/app
 
