@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-       STG_SERVER = "52.91.43.161"
-        PRD_SERVER = "3.88.228.242"
+        DEV_SERVER = "54.164.61.216"
+        STG_SERVER = "34.201.99.182"
+        PRD_SERVER = "52.87.171.158"
         USER = "ec2-user"
     }
 
@@ -15,33 +16,56 @@ pipeline {
             }
         }
 
-        stage('Deploy to STG') {
-            when { branch 'stage' }
+        stage('Deploy Based on Branch') {
             steps {
-                sh '''
-                scp -o StrictHostKeyChecking=no index.html $USER@$STG_SERVER:/tmp/index.html
-                ssh -o StrictHostKeyChecking=no $USER@$STG_SERVER "
-                    sudo yum install httpd -y
-                    sudo systemctl start httpd
-                    sudo systemctl enable httpd
-                    sudo cp /tmp/index.html /var/www/html/index.html
-                    sudo systemctl restart httpd
-                "
-                '''
-            }
-        }
+                script {
 
-        stage('Deploy to PROD') {
-            when { branch 'production' }
-            steps {
-                sh '''
-                scp -o StrictHostKeyChecking=no index.html $USER@$PRD_SERVER:/tmp/index.html
-                ssh -o StrictHostKeyChecking=no $USER@$PRD_SERVER "
-                    sudo cp /tmp/index.html /var/www/html/index.html
-                    sudo systemctl restart httpd
-                "
-                '''
+                    if (env.BRANCH_NAME == "dev") {
+                        deployApp(DEV_SERVER)
+                    }
+
+                    else if (env.BRANCH_NAME == "stg") {
+                        deployApp(STG_SERVER)
+                    }
+
+                    else if (env.BRANCH_NAME == "prd") {
+                        deployApp(PRD_SERVER)
+                    }
+                }
             }
         }
     }
+}
+
+def deployApp(SERVER_IP) {
+    sh """
+    ssh -o StrictHostKeyChecking=no ec2-user@${SERVER_IP} '
+    
+    # Clean old app
+    docker stop myapp || true
+    docker rm myapp || true
+    docker rmi myapp || true
+
+    # Create app directory
+    mkdir -p /home/ec2-user/app
+    cd /home/ec2-user/app
+
+    # Remove old files
+    rm -rf *
+
+    '
+    
+    # Copy project files to server
+    scp -o StrictHostKeyChecking=no -r * ec2-user@${SERVER_IP}:/home/ec2-user/app/
+
+    # Build and run on server
+    ssh -o StrictHostKeyChecking=no ec2-user@${SERVER_IP} '
+    
+    cd /home/ec2-user/app
+
+    docker build -t myapp .
+    docker run -d -p 80:80 --name myapp myapp
+    
+    '
+    """
 }
