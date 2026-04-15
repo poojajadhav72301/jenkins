@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DEV_SERVER = "54.164.61.216"
-        STG_SERVER = "34.201.99.182"
-        PRD_SERVER = "52.87.171.158"
+        DEV_SERVER = "3.94.115.91"
+        STG_SERVER = "54.167.16.40"
+        PRD_SERVER = "54.161.41.70"
         USER = "ec2-user"
     }
 
@@ -63,8 +63,8 @@ def deployApp(SERVER_IP) {
     
     cd /home/ec2-user/app
 
-    docker build -t myapp .
-    docker run -d -p 80:80 --name myapp myapp
+    docker build --no-cache -t myapp .
+    docker run -d -p 8080:80 --name myapp myapp
     
     '
     """
