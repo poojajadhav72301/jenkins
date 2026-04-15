@@ -42,9 +42,9 @@ def deployApp(SERVER_IP) {
     ssh -o StrictHostKeyChecking=no ec2-user@${SERVER_IP} '
     
     # Clean old app
-    docker stop myapp || true
-    docker rm myapp || true
-    docker rmi myapp || true
+    sudo docker stop myapp || true
+    sudo docker rm myapp || true
+    sudo docker rmi myapp || true
 
     # Create app directory
     mkdir -p /home/ec2-user/app
@@ -63,8 +63,8 @@ def deployApp(SERVER_IP) {
     
     cd /home/ec2-user/app
 
-    docker build --no-cache -t myapp .
-    docker run -d -p 8080:80 --name myapp myapp
+    sudo docker build --no-cache -t myapp .
+    sudo docker run -d -p 8080:80 --name myapp myapp
     
     '
     """
