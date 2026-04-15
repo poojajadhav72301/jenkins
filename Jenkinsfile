@@ -24,11 +24,11 @@ pipeline {
                         deployApp(DEV_SERVER)
                     }
 
-                    else if (env.BRANCH_NAME == "stg") {
+                    else if (env.BRANCH_NAME == "stage") {
                         deployApp(STG_SERVER)
                     }
 
-                    else if (env.BRANCH_NAME == "prd") {
+                    else if (env.BRANCH_NAME == "production") {
                         deployApp(PRD_SERVER)
                     }
                 }
@@ -64,7 +64,7 @@ def deployApp(SERVER_IP) {
     cd /home/ec2-user/app
 
     docker build -t myapp .
-    docker run -d -p 8081:80 --name myapp myapp
+    docker run -d -p 80:80 --name myapp myapp
     
     '
     """
