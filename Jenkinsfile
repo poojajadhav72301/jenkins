@@ -64,7 +64,7 @@ def deployApp(SERVER_IP) {
     cd /home/ec2-user/app
 
     docker build -t myapp .
-    docker run -d -p 80:80 --name myapp myapp
+    docker run -d -p 8081:80 --name myapp myapp
     
     '
     """
